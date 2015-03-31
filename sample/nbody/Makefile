@@ -1,10 +1,11 @@
 PS_PATH = -I../../src/
 
-CC = g++
-#CC = mpicxx
+#CC = g++
+CC = mpicxx
 CFLAGS = -O3 -ffast-math -funroll-loops #-Wall
 #CFLAGS += -DPARTICLE_SIMULATOR_THREAD_PARALLEL -fopenmp
-#CFLAGS += -DPARTICLE_SIMULATOR_MPI_PARALLEL
+CFLAGS += -DOpenCL
+CFLAGS += -DPARTICLE_SIMULATOR_MPI_PARALLEL
 
 #use_phantom_grape_x86 = yes
 
@@ -14,10 +15,14 @@ CFLAGS  += -DENABLE_PHANTOM_GRAPE_X86
 CLIBS   += -L../../src/phantom_grape_x86/G5/newton/libpg5/ -lpg5
 endif
 
+PS_PATH += -I/opt/AMDAPP/include
+CLIBS   += -lOpenCL
+
 SRC = nbody.cpp
+
 PROGRAM = $(SRC:%.cpp=%.out)
 
-$(PROGRAM):$(SRC)
+$(PROGRAM):$(SRC) user-defined.hpp OpenCLDevice.hpp
 	$(CC) $(MULEXP) $(PS_PATH) $(CFLAGS) -o $@ $< $(CLIBS)
 
 clean:	
